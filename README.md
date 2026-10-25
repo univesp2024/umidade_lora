@@ -98,5 +98,3 @@ Para garantir a comunicação entre chips diferentes (SX1276 na V2 e SX1262 na V
 * **Spreading Factor (SF):** 7
 * **Coding Rate:** 4/5
 * **Sync Word:** 0x12
-
-Deseja incluir no repositório uma seção dedicada às imagens (como fotos do hardware montado em campo, diagrama esquemático ou capturas de tela do dashboard funcionando)?
