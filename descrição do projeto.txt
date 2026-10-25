@@ -1,0 +1,37 @@
+1. Hardware (Componentes Físicos)
+- Nó Transmissor (Slave / Campo):
+  - Plataforma Base: Heltec WiFi LoRa 32 V2.
+  - Microcontrolador: ESP32 (Dual-core, Wi-Fi/Bluetooth integrados).
+  - Transceptor de Rádio: Chip LoRa SX1276 (operando em 915 MHz).
+  - Interface Visual: Display OLED integrado de 0.96" (SSD1306, 128x64 pixels) e LED embutido (pino 25) para feedback de transmissão.
+
+- Sensor de Umidade do Solo:
+  - Módulo: Sensor higrômetro de solo acompanhado do chip comparador LM393.
+  - Leitura: Utilização exclusiva da saída analógica (A0 conectada ao ADC do ESP32) para capturar a variação de tensão e calcular a porcentagem exata de umidade da terra.
+
+- Nó Receptor (Gateway Master / Base):
+  - Plataforma Base: Heltec WiFi LoRa 32 V3.
+  - Microcontrolador: ESP32-S3 (Arquitetura atualizada, maior capacidade de processamento).
+  - Transceptor de Rádio: Chip LoRa SX1262 (Nova geração, exige biblioteca específica).
+  - Interface Visual: Display OLED integrado e LED embutido (pino 35) para indicativo de recebimento de pacotes.
+
+2. Software Embarcado (Firmware dos Microcontroladores)
+- Ambiente de Desenvolvimento: Arduino IDE.
+- Linguagem de Programação: C++.
+- Bibliotecas e Protocolos do Transmissor (V2):
+  - LoRa.h: Biblioteca padrão mantida por Sandeep Mistry para controle do chip SX1276 via barramento SPI.
+  - Adafruit_SSD1306.h e Adafruit_GFX.h: Renderização de texto no display via protocolo I2C (Wire.h).
+  - Bibliotecas e Protocolos do Receptor (V3):
+  - RadioLib.h: Biblioteca avançada de rádio (Jan Gromeš) necessária para operar o novo chip SX1262, configurada para espelhar a modulação exata da V2 (SF 7, BW 125kHz, Sync Word 0x12) garantindo a interoperabilidade.
+  - WiFi.h e HTTPClient.h: Conexão à rede local e envio de dados para a web.
+  - WiFiClientSecure.h: Camada de segurança (SSL/TLS) para permitir requisições HTTPS contornando a verificação estrita de certificados na placa.
+
+3. Infraestrutura Web e Backend
+- Hospedagem e Segurança: Servidor remoto no domínio geopos.com.br com tráfego criptografado via HTTPS.
+- Linguagem da API: PHP. O arquivo api.php atua como um endpoint RESTful simplificado, recebendo requisições HTTP POST contendo o ID do nó e o valor da umidade.
+- Banco de Dados: MySQL. Banco monitoramento_solo com a tabela relacional leituras, utilizando DATETIME DEFAULT CURRENT_TIMESTAMP para o registro cronológico exato da chegada dos dados. A comunicação do PHP com o banco é feita nativamente ou via PDO.
+
+4. Frontend (Dashboard de Monitoramento)
+- Estrutura da Aplicação: Interface desenvolvida em HTML5 e incorporada no arquivo index.php, que realiza consultas em tempo real ao banco de dados para buscar os registros mais recentes.
+- Visualização de Dados: Biblioteca JavaScript Chart.js consumida via CDN. Responsável por gerar os gráficos de linha dinâmicos e responsivos, plotando a evolução percentual da umidade ao longo do tempo.
+- Automação: Script simples em JavaScript (setTimeout) para realizar o auto-refresh (recarregamento) da página a cada 10 segundos, sincronizando com a taxa de transmissão da placa no campo.
